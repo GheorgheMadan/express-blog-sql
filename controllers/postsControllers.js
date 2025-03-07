@@ -1,5 +1,5 @@
 //importo i dati dei posts 
-import connetion from '../data/postsData.js';
+import connection from '../data/postsData.js';
 
 // INDEX FUNZIONE CHE CI MOSTRERA' L'INTERO ARRAY DI OGGETTI 
 function index(req, res) {
@@ -8,7 +8,7 @@ function index(req, res) {
     const sql = 'SELECT * FROM posts'
 
     // eseguo la query 
-    connetion.query(sql, (err, results) => {
+    connection.query(sql, (err, results) => {
         if (err) return res.status(500).json({ error: 'Database query failed' });
         res.json(results)
     }
@@ -43,32 +43,15 @@ function destroy(req, res) {
     // Converto il parametro ID in un numero intero 
     const id = parseInt(req.params.id);
 
-    // Cerco il post con l'ID corrispondente all'array
-    const post = posts.find(post => post.id === id)
+    // creo la query che elimina in base l'id 
+    const sql = 'DELETE FROM posts WHERE id = ?'
 
-    // Se il post non viene trovato 
-    if (!post) {
-
-        //imposto lo status 404
-        res.status(404)
-
-        // restituisco un messaggio di errore (formato json)
-        return res.json({
-            error: "Not Found", // Tipo di errore 
-            message: "Post non trovato" // descrizione del problema
-        })
-    };
-
-    // elimino il post 
-    posts.splice(posts.indexOf(post), 1); // cancello 1 elemento
-
-
-    // stampo in console l'array per confrontare il risultato 
-    console.log(posts);
-
-    // imposto lo status a 204 modifica avvenuta
-    res.sendStatus(204)
-
+    connection.query(sql, [id], (err) => {
+        if (err) return res.status(500).json({ error: 'Failed to delete post' });
+        // imposto lo status a 204 modifica avvenuta
+        res.sendStatus(204)
+    }
+    )
 };
 
 
