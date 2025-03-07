@@ -21,12 +21,29 @@ function show(req, res) {
     // Converto il parametro ID in un numero intero 
     const id = parseInt(req.params.id);
 
-    const sql = 'SELECT * FROM posts WHERE id = ?'
+    const sqlPosts = 'SELECT * FROM posts WHERE id = ?'
 
-    connection.query(sql, [id], (err, results) => {
+    const sqlTags = `SELECT tags.* FROM tags
+    JOIN post_tag ON tags.id = post_tag.tag_id
+    WHERE post_tag.post_id = ?
+    `
+
+    connection.query(sqlPosts, [id], (err, resultsPosts) => {
         if (err) return res.status(500).json({ error: 'Database Query failed' })
-        if (results.length === 0) return res.status(404).json({ error: 'Post Not Found' })
-        res.json(results[0])
+        if (resultsPosts.length === 0) return res.status(404).json({ error: 'Post Not Found' })
+
+        const post = resultsPosts[0]
+
+        connection.query(sqlTags, [id], (err, resultsTags) => {
+            if (err) return res.status(500).json({ error: 'Data base query failed' });
+
+            // aggiungo i tag al post
+            post.tags = resultsTags;
+            res.json(post)
+        })
+
+
+
     })
 }
 
