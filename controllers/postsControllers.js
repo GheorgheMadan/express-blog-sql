@@ -1,22 +1,18 @@
 //importo i dati dei posts 
-// const posts = require('../data/postsData.js');
 import connetion from '../data/postsData.js';
 
-// FUNZIONE CHE CONTIENE UN FILTRO QUESOTO MOSTRA SOLO I POST CHE HANNO UN DETERMINATO TAG 
+// INDEX FUNZIONE CHE CI MOSTRERA' L'INTERO ARRAY DI OGGETTI 
 function index(req, res) {
-    // // simulo un ERRORE 
-    // CiaoSonoUnErrore
 
-    // Assegna a filteredPosts l'intero array di post, prima di applicare eventuali filtri
-    let filteredPosts = posts
+    // preparo la query 
+    const sql = 'SELECT * FROM posts'
 
-    // Controlla se nella query string è presente il parametro "tags"
-    if (req.query.tags) {
-        // Se c'è un parametro "tags", filtra i post che contengono il tag specificato
-        // Uso il metodo "filter" per selezionare solo i post che hanno il tag presente nella query
-        filteredPosts = posts.filter(post => post.tags.includes(req.query.tags))
-    };
-    res.json(filteredPosts);
+    // eseguo la query 
+    connetion.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: 'Database query failed' });
+        res.json(results)
+    }
+    )
 }
 
 
@@ -192,4 +188,4 @@ function patch(req, res) {
 
 }
 // esportiamo tutto
-module.exports = { index, show, destroy, post, putUpdate, patch }
+export { index, show, destroy, post, putUpdate, patch };
